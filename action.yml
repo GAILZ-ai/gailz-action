@@ -1,0 +1,22 @@
+name: 'Gailz Compliance Gate'
+description: 'Block releases when outstanding technical compliance actions exist in gailz.'
+
+inputs:
+  api_url:
+    description: 'Base URL of the gailz-ai API (e.g. https://api.gailz.example.com)'
+    required: true
+  api_key:
+    description: 'API key for release gate authentication'
+    required: true
+  timeout_minutes:
+    description: 'Maximum minutes to wait for analysis before failing'
+    required: false
+    default: '30'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  env:
+    GAILZ_API_URL: ${{ inputs.api_url }}
+    GAILZ_API_KEY: ${{ inputs.api_key }}
+    GAILZ_TIMEOUT_MINUTES: ${{ inputs.timeout_minutes }}
