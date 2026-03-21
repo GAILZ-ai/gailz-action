@@ -1,6 +1,6 @@
 # gailz-action
 
-GitHub Action that gates releases on compliance status from the [Gailz](https://github.com/your-org/gailz-ui) platform.
+GitHub Action that gates releases on compliance status from the [Gailz](https://github.com/gailz-ai/gailz-ui) platform.
 
 ## Usage
 
@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Compliance gate
-        uses: your-org/gailz-action@v1
+        uses: gailz-ai/gailz-action@v1
         with:
           api_url: ${{ secrets.GAILZ_API_URL }}
           api_key: ${{ secrets.GAILZ_API_KEY }}
