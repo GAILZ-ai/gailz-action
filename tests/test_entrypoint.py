@@ -55,9 +55,10 @@ class TestEvaluateResponse:
     def test_pass_exits_0(self) -> None:
         resp = _mock_response(200, {
             "status": "pass",
-            "total_technical_actions": 5,
-            "not_met_count": 0,
-            "partially_met_count": 0,
+            "total": 5,
+            "outstanding": 0,
+            "overrides": {"accepted": 0, "false_positive": 0},
+            "detail": [],
         })
         from entrypoint import evaluate_response
         with pytest.raises(SystemExit) as exc:
@@ -67,9 +68,10 @@ class TestEvaluateResponse:
     def test_fail_exits_1(self) -> None:
         resp = _mock_response(200, {
             "status": "fail",
-            "total_technical_actions": 5,
-            "not_met_count": 2,
-            "partially_met_count": 1,
+            "total": 5,
+            "outstanding": 3,
+            "overrides": {"accepted": 1, "false_positive": 1},
+            "detail": [],
         })
         from entrypoint import evaluate_response
         with pytest.raises(SystemExit) as exc:
@@ -117,8 +119,8 @@ class TestEvaluateResponse:
 
 class TestPollGate:
     def test_returns_immediately_on_200(self) -> None:
-        pass_resp = _mock_response(200, {"status": "pass", "total_technical_actions": 0,
-                                        "not_met_count": 0, "partially_met_count": 0})
+        pass_resp = _mock_response(200, {"status": "pass", "total": 0, "outstanding": 0,
+                                        "overrides": {"accepted": 0, "false_positive": 0}, "detail": []})
         with patch("requests.post", return_value=pass_resp), \
              patch("time.sleep") as mock_sleep:
             from entrypoint import poll_gate
@@ -134,8 +136,8 @@ class TestPollGate:
 
     def test_retries_on_503_then_passes(self) -> None:
         pending_resp = _mock_response(503, {"message": "pending"}, headers={"Retry-After": "1"})
-        pass_resp = _mock_response(200, {"status": "pass", "total_technical_actions": 0,
-                                        "not_met_count": 0, "partially_met_count": 0})
+        pass_resp = _mock_response(200, {"status": "pass", "total": 0, "outstanding": 0,
+                                        "overrides": {"accepted": 0, "false_positive": 0}, "detail": []})
         with patch("requests.post", side_effect=[pending_resp, pass_resp]), \
              patch("time.sleep"):
             from entrypoint import poll_gate

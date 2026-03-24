@@ -53,16 +53,19 @@ def evaluate_response(resp: requests.Response) -> int | None:
     if resp.status_code == 200:
         data = resp.json()
         gate_status = data.get("status")
-        not_met = data.get("not_met_count", 0)
-        partially_met = data.get("partially_met_count", 0)
-        total = data.get("total_technical_actions", 0)
+        total = data.get("total", 0)
+        outstanding = data.get("outstanding", 0)
+        overrides = data.get("overrides", {})
+        accepted = overrides.get("accepted", 0)
+        false_positive = overrides.get("false_positive", 0)
         if gate_status == "pass":
-            print(f"Compliance gate: PASS ({total} technical actions, all met or unknown)")
+            print(f"Compliance gate: PASS ({total} technical actions, all met or overridden)")
             sys.exit(0)
         else:
             print(
-                f"Compliance gate: FAIL — {not_met} not met, {partially_met} partially met "
-                f"(of {total} total technical actions). Review findings in gailz."
+                f"Compliance gate: FAIL — {outstanding} outstanding actions "
+                f"(of {total} total; {accepted} accepted, {false_positive} false positive). "
+                f"Review findings in gailz."
             )
             sys.exit(1)
 
